@@ -31,6 +31,7 @@
         </div>
 
 		<script>
+            o = null;
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -92,7 +93,7 @@
 					return geometry.clone();
 				};
 
-				updateInfo()
+				updateInfo();
 			});
 
 			var loader2 = new THREE.JSONLoader();
@@ -149,7 +150,9 @@
 
 					dropdown += '>' + geometriesParams[i].type + '</option>';
 				}
-                dropdown += '<option id="userOBJ" value="' + i + '" disabled> --cargado por el usuario--</option>';
+                if (o === null) {
+                    dropdown += '<option id="userOBJ" value="' + i + '" disabled> --cargado por el usuario--</option>';
+                }
 
 				dropdown += '</select>';
 
@@ -174,7 +177,8 @@
 					geometry.applyMatrix(new THREE.Matrix4().makeScale(params.scale, params.scale, params.scale));
 				}
 
-				THREE.GeometryUtils.triangulateQuads(geometry);
+                //!
+				//THREE.GeometryUtils.triangulateQuads(geometry);
 				// Cloning original geometry for debuging
 				smooth = geometry.clone();
 
@@ -423,18 +427,47 @@
             reader.onload = (function(theFile) {
                 return function(e) {
                 // Render thumbnail.
-                var o = new THREE.OBJLoader().parse(e.target.result);
+                var objName = theFile.name.replace(/\.[^/.]+$/, "");
+
+                var option = $('#userOBJ');
+                option.html(objName).removeAttr('disabled');
+
+                // Se obtiene la geometria del OBJ
+                u = o;
+                o = {geometry: new THREE.OBJLoader().parse(e.target.result).children[0].geometry, name: objName};
+
+                // Se ajusta la escala para graficar el OBJ
+                o.geometry.computeBoundingBox();
+                c = ["x", "y", "z"];
+                d = []; 
+                for (i=0; i < 3; ++i) {
+                    d[i] = o.geometry.boundingBox.max[c[i]] - o.geometry.boundingBox.min[c[i]];
+                }
+                var max = d.sort()[2];
+
+                if (u !== null) {
+                    geometriesParams.pop();
+                }
+                geometriesParams.push({type: objName, args: [], scale: 100/max, meshScale:2 });
+
+                THREE[objName] = function(){
+                    return o.geometry.clone();
                 };
-            })(f);
 
-            // Read in the image file as a data URL.
-            reader.readAsText(f);
-            }
-        }
+                console.log(option.val());
+                $('#dropdown').val(geometriesParams.length - 1).trigger('change');
 
-        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+            };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    }
+}
+
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
         </script>
-        
-	</body>
+
+    </body>
 </html>
 
