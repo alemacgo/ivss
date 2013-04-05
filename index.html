@@ -26,11 +26,35 @@
 
         <div id="selectorDeArchivo" >
             <div id="a">
-            <input type="file" id="files" name="files[]" />
+            Upload <input type="file" id="files" name="files[]" />
             <br/> 
             <output id="list"></output>
             </div>
         </div>
+
+        <script>
+        document.onkeydown = checkKey;
+
+        function checkKey(e) {
+            e = e || window.event;
+            if (e.keyCode == '38') {
+                // up
+				camera.position.z /= 1.05;
+            }
+            else if (e.keyCode == '40') {
+                // down
+				camera.position.z *= 1.05;
+            }
+            else if (e.keyCode == '37') {
+                // left
+				camera.position.x += 3;
+            }
+            else if (e.keyCode == '39') {
+                // right
+				camera.position.x -= 3;
+            }
+        }
+        </script>
 
 		<script>
             o = null;
@@ -140,9 +164,8 @@
 				dropdown += '</select>';
 
 				info.innerHTML = 
-				 	'<p id="info">'  + subdivisions +
-                    ' subdivisions<br/><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a> <br />' +
-                    'Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a></p>';
+                '<p id="info">UP and DOWN keys to zoom<br/>LEFT and RIGHT keys to move<br/>Drag to rotate<br/><br/><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a><br/><span>' + subdivisions + ' subdivisions</span><br/><br/>' +
+                    'Select ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a></p>';
 			}
 
 			function addStuff(){
