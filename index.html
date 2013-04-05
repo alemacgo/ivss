@@ -1,426 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>Subdivisions with Loop</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <head>
+        <title>Subdivisions with Loop</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
-        <!--<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>-->
-        
+        <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
 
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
-	</head>
-	<body>
-		<script src="lib/jquery.min.js"></script>
-		<script src="lib/detect-zoom.min.js"></script>
-		<script src="lib/three.js"></script>
-		<script src="js/SubdivisionModifier.js"></script>
-		<script src="js/OBJLoader.js"></script>
+
+        <style>
+            body {
+                font-family: Monospace;
+                background-color: #fff;
+                margin: 0px;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="lib/jquery.min.js"></script>
+        <script src="lib/detect-zoom.min.js"></script>
+        <script src="lib/three.js"></script>
+        <script src="js/SubdivisionModifier.js"></script>
+        <script src="js/OBJLoader.js"></script>
 
         <div id="tope">
-            <!--<a href="#" onclick="nextSubdivision(1); return false;"><span id="titulo"></span></a>-->
             <div id="tope2"></div>
-            <a href="#" onclick="previousGeometry();return false;"><img src="img/arrow-left.png" height="40px" alt="next"/></a><span style="margin: 0 10px;" id="titulo"></span> <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a>
-        <div id="selectorDeArchivo" >
-            <div id="a">
-            Upload <input type="file" id="files" name="files[]" />
+            <a href="#" onclick="previousGeometry();return false;"><img src="img/arrow-left.png" height="40px" alt="next"/></a><span class="big" style="margin: 0 10px;" id="titulo"></span> <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a>
+            <div id="selectorDeArchivo" >
+                <div id="a">
+                    Upload <input type="file" id="files" name="files[]" />
+                </div>
             </div>
-        </div>
         </div>
 
         <script>
-        document.onkeydown = checkKey;
+            document.onkeydown = checkKey;
 
-        function checkKey(e) {
-            e = e || window.event;
-            if (e.keyCode == '38') {
-                // up
-				camera.position.z /= 1.05;
+            function checkKey(e) {
+                e = e || window.event;
+                if (e.keyCode == '38') {
+                    // up
+                    camera.position.z /= 1.05;
+                }
+                else if (e.keyCode == '40') {
+                    // down
+                    camera.position.z *= 1.05;
+                }
+                else if (e.keyCode == '37') {
+                    // left
+                    camera.position.x += 3;
+                }
+                else if (e.keyCode == '39') {
+                    // right
+                    camera.position.x -= 3;
+                }
             }
-            else if (e.keyCode == '40') {
-                // down
-				camera.position.z *= 1.05;
-            }
-            else if (e.keyCode == '37') {
-                // left
-				camera.position.x += 3;
-            }
-            else if (e.keyCode == '39') {
-                // right
-				camera.position.x -= 3;
-            }
-        }
         </script>
 
-		<script>
+        <script>
             o = null;
-			var container, stats;
+            var container, stats;
 
-			var camera, scene, renderer;
+            var camera, scene, renderer;
 
-			var cube, plane;
+            var cube, plane;
 
             targetYRotation = targetXRotation = 0.5;
 
-			var targetYRotationOnMouseDown = targetXRotationOnMouseDown = 0;
+            var targetYRotationOnMouseDown = targetXRotationOnMouseDown = 0;
 
-			var mouseX = 0, mouseY = 0;
-			var mouseXOnMouseDown = 0;
+            var mouseX = 0, mouseY = 0;
+            var mouseXOnMouseDown = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+            var windowHalfX = window.innerWidth / 2;
+            var windowHalfY = window.innerHeight / 2;
 
-			// Create new object by parameters
-			var createSomething = function(klass, args){
-				var F = function(klass, args){
-				    return klass.apply(this, args);
-				}
-				F.prototype = klass.prototype;
-				return new F(klass, args);
-			};
+            // Create new object by parameters
+            var createSomething = function(klass, args){
+                var F = function(klass, args){
+                    return klass.apply(this, args);
+                }
+                F.prototype = klass.prototype;
+                return new F(klass, args);
+            };
 
-			// Cube
-			var materials = [];
-			for(var i = 0; i < 6; i ++){
-				materials.push([new THREE.MeshBasicMaterial({ color: Math.random()* 0xffffff, wireframe: false })]);
-			}
+            // Cube
+            var materials = [];
+            for(var i = 0; i < 6; i ++){
+                materials.push([new THREE.MeshBasicMaterial({ color: Math.random()* 0xffffff, opacity: 1.0, wireframe: true })]);
+            }
 
-			var geometriesParams = [
-				{ type: 'CubeGeometry', args: [200, 200, 200, 2, 2, 2, materials]},
-				{ type: 'TorusGeometry', args: [100, 60, 4, 8, Math.PI*2]},
-			];
+            var geometriesParams = [
+            { type: 'CubeGeometry', args: [200, 200, 200, 2, 2, 2, materials]},
+            { type: 'TorusGeometry', args: [100, 60, 4, 8, Math.PI*2]},
+            ];
 
-			var loader = new THREE.JSONLoader();
-			loader.load('obj/WaltHeadLo.js', function(geometry){
-				geometriesParams.push({type: 'WaltHead', args: [], meshScale: 6 });
-				THREE.WaltHead = function(){
-					return geometry.clone();
-				};
+            new THREE.JSONLoader().load('obj/Buffalo.js', function(geometry){
+                geometriesParams.push({type: 'Buffalo', args: [], meshScale: 1.8 });
+                THREE.Buffalo = function(){
+                    return geometry.clone();
+                };
+                updateInfo();
+            });
 
-				updateInfo();
-			});
+            new THREE.JSONLoader().load('obj/Suzanne.js', function(geometry){
+                geometriesParams.push({type: 'Suzanne', args: [], scale: 100, meshScale:2 });
+                THREE.Suzanne = function(){
+                    return geometry.clone();
+                };
+                updateInfo()
+            });
 
-			var loader2 = new THREE.JSONLoader();
-			loader2.load('obj/Suzanne.js', function(geometry){
-				geometriesParams.push({type: 'Suzanne', args: [], scale: 100, meshScale:2 });
-				THREE.Suzanne = function(){
-					return geometry.clone();
-				};
-				updateInfo()
-			});
+            new THREE.JSONLoader().load('obj/WaltHeadLo.js', function(geometry){
+                geometriesParams.push({type: 'WaltHead', args: [], meshScale: 6 });
+                THREE.WaltHead = function(){
+                    return geometry.clone();
+                };
+
+                updateInfo();
+            });
+
+            new THREE.JSONLoader().load('obj/LeePerrySmith.js', function(geometry){
+                geometriesParams.push({type: 'LeePerrySmith', args: [], meshScale:40 });
+                THREE.LeePerrySmith = function(){
+                    return geometry.clone();
+                };
+                updateInfo()
+            });
 
 
-			var info;
-			var subdivisions = 0;
-			var geometryIndex = 0;
+            var info;
+            var subdivisions = 0;
+            var geometryIndex = 0;
 
-			// start scene
+            // start scene
 
-			init();
-			animate();
+            init();
+            animate();
 
-			function nextSubdivision(x){
-				subdivisions = Math.max(0, subdivisions + x);
-				addStuff();
-			}
+            function nextSubdivision(x){
+                subdivisions = Math.max(0, subdivisions + x);
+                addStuff();
+            }
 
-			function previousGeometry(){
-				geometryIndex--;
+            function previousGeometry(){
+                geometryIndex--;
 
-				if (geometryIndex < 0) {
-					geometryIndex = geometriesParams.length - 1;
-				}
-
-				addStuff();
-			}
-
-			function nextGeometry(){
-				geometryIndex ++;
-
-				if (geometryIndex > geometriesParams.length - 1){
-					geometryIndex = 0;
-				}
-
-				addStuff();
-			}
-
-			function switchGeometry(i){
-
-				geometryIndex = i;
-
-				addStuff();
-			}
-
-			function updateInfo(){
-                var titulo = document.getElementById('titulo');
-
-				var params = geometriesParams[geometryIndex];
-
-				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
-
-				for(i = 0; i < geometriesParams.length; i ++){
-					dropdown += '<option value="' + i + '"';
-
-					dropdown += (geometryIndex == i) ? ' selected' : '';
-
-					dropdown += '>' + geometriesParams[i].type + '</option>';
-				}
-
-                titulo.innerHTML = geometriesParams[geometryIndex].type;
-
-                if (o === null) {
-                    dropdown += '<option id="userOBJ" value="' + i + '" disabled> --upload an OBJ model below--</option>';
+                if (geometryIndex < 0) {
+                    geometryIndex = geometriesParams.length - 1;
                 }
 
-				dropdown += '</select>';
+                camera.position.z = 500;
+                addStuff();
+            }
 
-				info.innerHTML = 
-                '<p id="info">UP and DOWN keys to zoom<br/>LEFT and RIGHT keys to move<br/>Drag to rotate<br/><br/><br/><span style="margin-right:20px">' + subdivisions + ' subdivisions</span><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a><br/><span></p>';
+            function nextGeometry(){
+                geometryIndex ++;
+
+                if (geometryIndex > geometriesParams.length - 1){
+                    geometryIndex = 0;
+                }
+
+                camera.position.z = 500;
+                addStuff();
+            }
+
+            function switchGeometry(i){
+
+                geometryIndex = i;
+
+                camera.position.z = 500;
+                addStuff();
+            }
+
+            function updateInfo(){
+                var titulo = document.getElementById('titulo');
+
+                var params = geometriesParams[geometryIndex];
+
+                var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
+
+                    for(i = 0; i < geometriesParams.length; i ++){
+                        dropdown += '<option value="' + i + '"';
+
+                        dropdown += (geometryIndex == i) ? ' selected' : '';
+
+                        dropdown += '>' + geometriesParams[i].type + '</option>';
+                    }
+
+                    titulo.innerHTML = geometriesParams[geometryIndex].type;
+
+                    if (o === null) {
+                        dropdown += '<option id="userOBJ" value="' + i + '" disabled> --upload an OBJ model below--</option>';
+                    }
+
+                    dropdown += '</select>';
+
+                // Quickly compute the number of edges, this isn't stored by the Geometry object
+                var edgeFaceMap = THREE.GeometryUtils.computeEdgeFaces(smooth);
+                var edgeCount = 0;
+                for (x in edgeFaceMap) {
+                    edgeCount++;
+                }
+
+                info.innerHTML = 
+                '<p id="info">UP and DOWN keys to zoom<br/>LEFT and RIGHT keys to move<br/>Drag to rotate<br/><br/><br/><span class="big" style="margin-right:20px">' + subdivisions + ' subdivisions</span><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a><br/>' +
+                '<br/>After △-tesselation and subdivisions:<br/><span class="color">' +
+                    smooth.vertices.length + '</span> vertices<br/><span class="color">' +
+                    smooth.faces.length + '</span> faces<br/><span class="color">' +
+                    edgeCount + '</span> edges<br/></p>';
 
                 var tope2 = document.getElementById('tope2');
                 tope2.innerHTML = dropdown;
-                
-			}
 
-			function addStuff(){
-				if(cube) {
-					scene.remove(group);
-					scene.remove(cube);
-				}
+            }
 
-				var modifier = new THREE.SubdivisionModifier(subdivisions);
-				var params = geometriesParams[geometryIndex];
-				geometry = createSomething(THREE[params.type], params.args);
+            function addStuff(){
+                if(cube) {
+                    scene.remove(group);
+                    scene.remove(cube);
+                }
 
-				// Scale Geometry
-				if (params.scale) {
-					geometry.applyMatrix(new THREE.Matrix4().makeScale(params.scale, params.scale, params.scale));
-				}
+                var modifier = new THREE.SubdivisionModifier(subdivisions);
+                var params = geometriesParams[geometryIndex];
+                geometry = createSomething(THREE[params.type], params.args);
 
-                //!
-				THREE.GeometryUtils.triangulateQuads(geometry);
-				// Cloning original geometry for debuging
-				smooth = geometry.clone();
+                // Scale Geometry
+                if (params.scale) {
+                    geometry.applyMatrix(new THREE.Matrix4().makeScale(params.scale, params.scale, params.scale));
+                }
 
-				// mergeVertices(); is run in case of duplicated vertices
-				smooth.mergeVertices();
+                THREE.GeometryUtils.triangulateQuads(geometry);
+                // Cloning original geometry for debuging
+                smooth = geometry.clone();
 
-				smooth.computeCentroids();
-				smooth.computeFaceNormals();
-				smooth.computeVertexNormals();
+                // mergeVertices(); is run in case of duplicated vertices
+                smooth.mergeVertices();
 
-				modifier.modify(smooth);
+                smooth.computeCentroids();
+                smooth.computeFaceNormals();
+                smooth.computeVertexNormals();
 
-				updateInfo();
+                modifier.modify(smooth);
 
-				var faceABCD = "abcd";
-				var color, f, p, n, vertexIndex;
+                updateInfo();
 
-				for(i = 0; i < smooth.faces.length; i++){
+                var faceABCD = "abcd";
+                var color, f, p, n, vertexIndex;
 
-					f  = smooth.faces[i];
+                for(i = 0; i < smooth.faces.length; i++){
 
-					n = (f instanceof THREE.Face3)? 3 : 4;
+                    f  = smooth.faces[i];
 
-					for(var j = 0; j < n; j++){
+                    n = (f instanceof THREE.Face3)? 3 : 4;
 
-						vertexIndex = f[faceABCD.charAt(j)];
+                    for(var j = 0; j < n; j++){
 
-						p = smooth.vertices[vertexIndex];
+                        vertexIndex = f[faceABCD.charAt(j)];
 
-						color = new THREE.Color(0xffffff);
-						color.setHSL((p.y)/ 200 + 0.5, 1.0, 0.5);
+                        p = smooth.vertices[vertexIndex];
 
-						f.vertexColors[j]= color;
-					}
-				}
+                        color = new THREE.Color(0xffffff);
+                        color.setHSL((p.y)/ 200 + 0.5, 1.0, 0.5);
 
-				group = new THREE.Object3D();
-				group.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xfefefe, wireframe: true, opacity: 0.5 })));
-				scene.add(group);
+                        f.vertexColors[j]= color;
+                    }
+                }
 
-				var debugNewPoints = false;
-				var debugOldPoints = false;
+                group = new THREE.Object3D();
+                group.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xfefefe, wireframe: true, opacity: 0.5})));
+                scene.add(group);
 
-				// Debug new Points
-				if (debugNewPoints){
-					var PI2 = Math.PI * 2;
-					var program = function(context){
+                var debugNewPoints = false;
+                var debugOldPoints = false;
 
-						context.beginPath();
-						context.arc(0, 0, 1, 0, PI2, true);
-						context.closePath();
-						context.fill();
+                // Debug new Points
+                if (debugNewPoints){
+                    var PI2 = Math.PI * 2;
+                    var program = function(context){
 
-					}
+                        context.beginPath();
+                        context.arc(0, 0, 1, 0, PI2, true);
+                        context.closePath();
+                        context.fill();
 
-					for (var i = 0; i < smooth.vertices.length; i++) {
+                    }
 
-						particle = new THREE.Particle(new THREE.ParticleCanvasMaterial({ color: Math.random()* 0x808008 + 0x808080, program: program }));
-						particle.position = smooth.vertices[i];
-						var pos = smooth.vertices.position
-						particle.scale.x = particle.scale.y = 5;
-						group.add(particle);
-					}
-				}
+                    for (var i = 0; i < smooth.vertices.length; i++) {
+
+                        particle = new THREE.Particle(new THREE.ParticleCanvasMaterial({ color: Math.random()* 0x808008 + 0x808080, program: program, opacity: 1.0 }));
+                        particle.position = smooth.vertices[i];
+                        var pos = smooth.vertices.position
+                        particle.scale.x = particle.scale.y = 5;
+                        group.add(particle);
+                    }
+                }
 
 
-				//Debug original points
-				if (debugOldPoints){
-					var drawText = function(i){
-						return function(context){
-							context.beginPath();
-							context.scale(0.1,-0.1);
+                //Debug original points
+                if (debugOldPoints){
+                    var drawText = function(i){
+                        return function(context){
+                            context.beginPath();
+                            context.scale(0.1,-0.1);
 
-							context.fillText(i, 0,0);
-						};
-					}
+                            context.fillText(i, 0,0);
+                        };
+                    }
 
-					for(var i = 0; i < geometry.vertices.length; i++){
+                    for(var i = 0; i < geometry.vertices.length; i++){
 
-						particle = new THREE.Particle(new THREE.ParticleCanvasMaterial({ color: Math.random()* 0x808008 + 0x808080, program: drawText(i)}));
-						particle.position = smooth.vertices[i];
-						var pos = geometry.vertices.position
-						particle.scale.x = particle.scale.y = 30;
-						group.add(particle);
-					}
-				}
+                        particle = new THREE.Particle(new THREE.ParticleCanvasMaterial({ color: Math.random()* 0x808008 + 0x808080, program: drawText(i), opacity: 1.0}));
+                        particle.position = smooth.vertices[i];
+                        var pos = geometry.vertices.position
+                        particle.scale.x = particle.scale.y = 30;
+                        group.add(particle);
+                    }
+                }
 
-				var meshmaterials = [
-					new THREE.MeshLambertMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors }),
-					new THREE.MeshBasicMaterial({ color: 0x405040, wireframe: true, opacity: 0.8, transparent: true })
-				];
+                var meshmaterials = [
+                new THREE.MeshLambertMaterial({ color: 0xffffff, opacity: 1.0, shading: THREE.FlatShading, vertexColors: THREE.VertexColors }),
+                new THREE.MeshBasicMaterial({ color: 0x405040, wireframe: true, opacity: 0.8, transparent: true })
+                ];
 
-				cube = THREE.SceneUtils.createMultiMaterialObject(smooth, meshmaterials);
+                cube = THREE.SceneUtils.createMultiMaterialObject(smooth, meshmaterials);
 
-				var meshScale =  params.meshScale ? params.meshScale : 1;
+                var meshScale =  params.meshScale ? params.meshScale : 1;
 
-				cube.scale.x = meshScale;
-				cube.scale.y = meshScale;
-				cube.scale.z = meshScale;
+                cube.scale.x = meshScale;
+                cube.scale.y = meshScale;
+                cube.scale.z = meshScale;
                 //console.log(cube.rotation.x, cube.rotation.y);
 
-				scene.add(cube);
+                scene.add(cube);
 
-				group.scale.copy(cube.scale);
-			}
+                group.scale.copy(cube.scale);
+            }
 
-			function init(){
+            function init(){
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+                container = document.createElement('div');
+                document.body.appendChild(container);
 
-				info = document.createElement('div');
+                info = document.createElement('div');
 
-				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-				camera.position.z = 500;
+                camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+                camera.position.z = 500;
 
-				scene = new THREE.Scene();
+                scene = new THREE.Scene();
 
-				var light = new THREE.PointLight(0xffffff, 1.5);
-				light.position.set(1000, 1000, 2000);
-				scene.add(light);
+                var light = new THREE.PointLight(0xffffff, 1.5);
+                light.position.set(1000, 1000, 2000);
+                scene.add(light);
 
-				addStuff();
+                addStuff();
 
-				renderer = new THREE.WebGLRenderer({ antialias: true }); // WebGLRenderer CanvasRenderer
-				renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer = new THREE.WebGLRenderer({ antialias: true }); // WebGLRenderer CanvasRenderer
+                renderer.setSize(window.innerWidth, window.innerHeight);
 
-				container.appendChild(renderer.domElement);
-				document.body.appendChild(info);
+                container.appendChild(renderer.domElement);
+                document.body.appendChild(info);
 
-				document.addEventListener('mousedown', onDocumentMouseDown, false);
-				document.addEventListener('touchstart', onDocumentTouchStart, false);
-				document.addEventListener('touchmove', onDocumentTouchMove, false);
+                document.addEventListener('mousedown', onDocumentMouseDown, false);
+                document.addEventListener('touchstart', onDocumentTouchStart, false);
+                document.addEventListener('touchmove', onDocumentTouchMove, false);
 
-				window.addEventListener('resize', onWindowResize, false);
-			}
+                window.addEventListener('resize', onWindowResize, false);
+            }
 
-			function onWindowResize(){
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+            function onWindowResize(){
+                windowHalfX = window.innerWidth / 2;
+                windowHalfY = window.innerHeight / 2;
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
 
-				renderer.setSize(window.innerWidth, window.innerHeight);
-			}
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
 
-			function onDocumentMouseDown(event){
-				//event.preventDefault();
+            function onDocumentMouseDown(event){
+                //event.preventDefault();
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
-				document.addEventListener('mouseup', onDocumentMouseUp, false);
-				document.addEventListener('mouseout', onDocumentMouseOut, false);
+                document.addEventListener('mousemove', onDocumentMouseMove, false);
+                document.addEventListener('mouseup', onDocumentMouseUp, false);
+                document.addEventListener('mouseout', onDocumentMouseOut, false);
 
-				mouseXOnMouseDown = event.clientX - windowHalfX;
-				mouseYOnMouseDown = event.clientY - windowHalfY;
-				targetYRotationOnMouseDown = targetYRotation;
-				targetXRotationOnMouseDown = targetXRotation;
-			}
+                mouseXOnMouseDown = event.clientX - windowHalfX;
+                mouseYOnMouseDown = event.clientY - windowHalfY;
+                targetYRotationOnMouseDown = targetYRotation;
+                targetXRotationOnMouseDown = targetXRotation;
+            }
 
-			function onDocumentMouseMove(event){
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
+            function onDocumentMouseMove(event){
+                mouseX = event.clientX - windowHalfX;
+                mouseY = event.clientY - windowHalfY;
 
-				targetYRotation = targetYRotationOnMouseDown +(mouseX - mouseXOnMouseDown)* 0.02;
-				targetXRotation = targetXRotationOnMouseDown +(mouseY - mouseYOnMouseDown)* 0.02;
-			}
+                targetYRotation = targetYRotationOnMouseDown +(mouseX - mouseXOnMouseDown)* 0.02;
+                targetXRotation = targetXRotationOnMouseDown +(mouseY - mouseYOnMouseDown)* 0.02;
+            }
 
-			function onDocumentMouseUp(event){
-				document.removeEventListener('mousemove', onDocumentMouseMove, false);
-				document.removeEventListener('mouseup', onDocumentMouseUp, false);
-				document.removeEventListener('mouseout', onDocumentMouseOut, false);
-			}
+            function onDocumentMouseUp(event){
+                document.removeEventListener('mousemove', onDocumentMouseMove, false);
+                document.removeEventListener('mouseup', onDocumentMouseUp, false);
+                document.removeEventListener('mouseout', onDocumentMouseOut, false);
+            }
 
-			function onDocumentMouseOut(event){
-				document.removeEventListener('mousemove', onDocumentMouseMove, false);
-				document.removeEventListener('mouseup', onDocumentMouseUp, false);
-				document.removeEventListener('mouseout', onDocumentMouseOut, false);
-			}
+            function onDocumentMouseOut(event){
+                document.removeEventListener('mousemove', onDocumentMouseMove, false);
+                document.removeEventListener('mouseup', onDocumentMouseUp, false);
+                document.removeEventListener('mouseout', onDocumentMouseOut, false);
+            }
 
-			function onDocumentTouchStart(event){
-				if(event.touches.length == 1){
+            function onDocumentTouchStart(event){
+                if(event.touches.length == 1){
 
-					event.preventDefault();
+                    event.preventDefault();
 
-					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
-				}
-			}
+                    mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
+                    targetRotationOnMouseDown = targetRotation;
+                }
+            }
 
-			function onDocumentTouchMove(event){
-				if(event.touches.length == 1){
+            function onDocumentTouchMove(event){
+                if(event.touches.length == 1){
 
-					event.preventDefault();
+                    event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown +(mouseX - mouseXOnMouseDown)* 0.05;
-				}
-			}
+                    mouseX = event.touches[0].pageX - windowHalfX;
+                    targetRotation = targetRotationOnMouseDown +(mouseX - mouseXOnMouseDown)* 0.05;
+                }
+            }
 
-			//
+            //
 
-			function animate(){
-				requestAnimationFrame(animate);
+            function animate(){
+                requestAnimationFrame(animate);
 
-				render();
-				//stats.update();
-			}
+                render();
+                //stats.update();
+            }
 
-			function render(){
-				group.rotation.x = cube.rotation.x +=(targetXRotation - cube.rotation.x)* 0.05;
-				group.rotation.y = cube.rotation.y +=(targetYRotation - cube.rotation.y)* 0.05;
+            function render(){
+                group.rotation.x = cube.rotation.x +=(targetXRotation - cube.rotation.x)* 0.05;
+                group.rotation.y = cube.rotation.y +=(targetYRotation - cube.rotation.y)* 0.05;
 
-				renderer.render(scene, camera);
-			}
+                renderer.render(scene, camera);
+            }
 
             function refresh() {
                 var zoom = detectZoom.zoom();
@@ -432,61 +458,74 @@
                 refresh();
                 $(window).on('resize', refresh);
             });
-		</script>
+        </script>
 
         <script>
             function handleFileSelect(evt) {
-            var files = evt.target.files; // FileList object
+                var files = evt.target.files; // FileList object
 
-            // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, f; f = files[i]; i++) {
+                // Loop through the FileList and render image files as thumbnails.
+                for (var i = 0, f; f = files[i]; i++) {
 
-            var reader = new FileReader();
+                    var reader = new FileReader();
 
-            // Closure to capture the file information.
-            reader.onload = (function(theFile) {
-                return function(e) {
-                // Render thumbnail.
-                var objName = theFile.name.replace(/\.[^/.]+$/, "");
+                    // Closure to capture the file information.
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            // Render thumbnail.
+                            var objName = theFile.name.replace(/\.[^/.]+$/, "");
 
-                var option = $('#userOBJ');
-                option.html(objName).removeAttr('disabled');
+                            var option = $('#userOBJ');
+                            option.html(objName).removeAttr('disabled');
 
-                // Se obtiene la geometria del OBJ
-                u = o;
-                o = {geometry: new THREE.OBJLoader().parse(e.target.result).children[0].geometry, name: objName};
+                            // The OBJ geometry is obtained
+                            u = o;
 
-                // Se ajusta la escala para graficar el OBJ
-                o.geometry.computeBoundingBox();
-                c = ["x", "y", "z"];
-                d = []; 
-                for (i=0; i < 3; ++i) {
-                    d[i] = o.geometry.boundingBox.max[c[i]] - o.geometry.boundingBox.min[c[i]];
+                            try {
+                                var objGeometry = new THREE.OBJLoader().parse(e.target.result);
+                            }
+                            catch (err) {
+                                alert('Error loading the OBJ file. There are some undeclared vertices referenced by the faces section.');
+                                return;
+                            }
+
+                            o = {geometry: objGeometry.children[0].geometry, name: objName};
+
+                            // Now, we adjust the scale to draw the OBJ model
+                            if (o.geometry === undefined) {
+                                alert('Error loading the OBJ file. Please ensure that the model is topologically correct and that it contains only continuous surfaces.');
+                                return;
+                            }
+
+                            o.geometry.computeBoundingBox();
+                            c = ["x", "y", "z"];
+                            d = []; 
+                            for (i=0; i < 3; ++i) {
+                                d[i] = o.geometry.boundingBox.max[c[i]] - o.geometry.boundingBox.min[c[i]];
+                            }
+                            var max = d.sort()[2];
+
+                            if (u !== null) {
+                                geometriesParams.pop();
+                            }
+                            geometriesParams.push({type: objName, args: [], scale: 100/max, meshScale:2 });
+
+                            THREE[objName] = function(){
+                                return o.geometry.clone();
+                            };
+
+                            $('#dropdown').val(geometriesParams.length - 1).trigger('change');
+
+                        };
+                    })(f);
+
+                    // Read the OBJ file as text, for parsing later
+                    reader.readAsText(f);
                 }
-                var max = d.sort()[2];
+            }
 
-                if (u !== null) {
-                    geometriesParams.pop();
-                }
-                geometriesParams.push({type: objName, args: [], scale: 100/max, meshScale:2 });
-
-                THREE[objName] = function(){
-                    return o.geometry.clone();
-                };
-
-                $('#dropdown').val(geometriesParams.length - 1).trigger('change');
-
-            };
-        })(f);
-
-        // Read in the image file as a data URL.
-        reader.readAsText(f);
-    }
-}
-
-document.getElementById('files').addEventListener('change', handleFileSelect, false);
+            document.getElementById('files').addEventListener('change', handleFileSelect, false);
         </script>
 
     </body>
 </html>
-
