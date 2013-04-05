@@ -95,7 +95,7 @@
 
 
 			var info;
-			var subdivisions = 2;
+			var subdivisions = 0;
 			var geometryIndex = 0;
 
 			// start scene
@@ -163,6 +163,7 @@
 					geometry.applyMatrix(new THREE.Matrix4().makeScale(params.scale, params.scale, params.scale));
 				}
 
+				THREE.GeometryUtils.triangulateQuads(geometry);
 				// Cloning original geometry for debuging
 				smooth = geometry.clone();
 
