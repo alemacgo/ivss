@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
-        <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+        <!--<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>-->
         
 
 		<style>
@@ -24,12 +24,15 @@
 		<script src="js/SubdivisionModifier.js"></script>
 		<script src="js/OBJLoader.js"></script>
 
+        <div id="tope">
+            <!--<a href="#" onclick="nextSubdivision(1); return false;"><span id="titulo"></span></a>-->
+            <div id="tope2"></div>
+            <a href="#" onclick="previousGeometry();return false;"><img src="img/arrow-left.png" height="40px" alt="next"/></a><span style="margin: 0 10px;" id="titulo"></span> <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a>
         <div id="selectorDeArchivo" >
             <div id="a">
             Upload <input type="file" id="files" name="files[]" />
-            <br/> 
-            <output id="list"></output>
             </div>
+        </div>
         </div>
 
         <script>
@@ -64,7 +67,8 @@
 
 			var cube, plane;
 
-			var targetYRotation = targetXRotation = 0;
+            targetYRotation = targetXRotation = 0.5;
+
 			var targetYRotationOnMouseDown = targetXRotationOnMouseDown = 0;
 
 			var mouseX = 0, mouseY = 0;
@@ -127,6 +131,16 @@
 				addStuff();
 			}
 
+			function previousGeometry(){
+				geometryIndex--;
+
+				if (geometryIndex < 0) {
+					geometryIndex = geometriesParams.length - 1;
+				}
+
+				addStuff();
+			}
+
 			function nextGeometry(){
 				geometryIndex ++;
 
@@ -145,6 +159,7 @@
 			}
 
 			function updateInfo(){
+                var titulo = document.getElementById('titulo');
 
 				var params = geometriesParams[geometryIndex];
 
@@ -157,6 +172,9 @@
 
 					dropdown += '>' + geometriesParams[i].type + '</option>';
 				}
+
+                titulo.innerHTML = geometriesParams[geometryIndex].type;
+
                 if (o === null) {
                     dropdown += '<option id="userOBJ" value="' + i + '" disabled> --upload an OBJ model below--</option>';
                 }
@@ -164,8 +182,11 @@
 				dropdown += '</select>';
 
 				info.innerHTML = 
-                '<p id="info">UP and DOWN keys to zoom<br/>LEFT and RIGHT keys to move<br/>Drag to rotate<br/><br/><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a><br/><span>' + subdivisions + ' subdivisions</span><br/><br/>' +
-                    'Select ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a></p>';
+                '<p id="info">UP and DOWN keys to zoom<br/>LEFT and RIGHT keys to move<br/>Drag to rotate<br/><br/><br/><span style="margin-right:20px">' + subdivisions + ' subdivisions</span><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a><br/><span></p>';
+
+                var tope2 = document.getElementById('tope2');
+                tope2.innerHTML = dropdown;
+                
 			}
 
 			function addStuff(){
@@ -453,7 +474,6 @@
                     return o.geometry.clone();
                 };
 
-                console.log(option.val());
                 $('#dropdown').val(geometriesParams.length - 1).trigger('change');
 
             };
