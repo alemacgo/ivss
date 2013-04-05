@@ -5,6 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+        <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+        
 
 		<style>
 			body {
@@ -132,15 +134,15 @@
 					dropdown += '>' + geometriesParams[i].type + '</option>';
 				}
                 if (o === null) {
-                    dropdown += '<option id="userOBJ" value="' + i + '" disabled> --cargue su modelo con el botón abajo--</option>';
+                    dropdown += '<option id="userOBJ" value="' + i + '" disabled> --upload an OBJ model below--</option>';
                 }
 
 				dropdown += '</select>';
 
 				info.innerHTML = 
-				 	'<p id="info">Subdivisions: '  + subdivisions +
-					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a> <br />' +
-                    'Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a></p>';
+				 	'<p id="info">'  + subdivisions +
+                    ' subdivisions<br/><a href="#" onclick="nextSubdivision(1); return false;"><img src="img/plus.png" height="40px" alt="more"/></a><br/><a href="#" onclick="nextSubdivision(-1); return false;"><img src="img/minus.png" height="40px" alt="less"/></a> <br />' +
+                    'Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;"><img src="img/arrow-right.png" height="40px" alt="next"/></a></p>';
 			}
 
 			function addStuff(){
@@ -272,11 +274,6 @@
 				document.body.appendChild(container);
 
 				info = document.createElement('div');
-				info.style.position = 'absolute';
-				info.style.bottom = '20px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the geometry ';
 
 				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 				camera.position.z = 500;
@@ -385,8 +382,6 @@
                 var zoom = detectZoom.zoom();
                 zoom = Math.max(0.5, zoom);
                 camera.position.z = 500/zoom;
-                //$('#info').css('font-size', '12px');
-                //console.log($('#info').css('font-size'));
             }
 
             $(document).ready(function () {

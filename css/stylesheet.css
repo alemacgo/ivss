@@ -1,6 +1,21 @@
+body {
+    font-size: 18px;
+}
+
 #selectorDeArchivo {
     position: absolute;
     bottom: 0;
-    width: 100%;
+    right: 0;
 }
 
+#info {
+    font-family: 'PT Sans', sans-serif;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    overflow: hidden;
+}
+
+#leftdiv {
+    float: left;
+}
