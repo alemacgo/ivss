@@ -1,0 +1,60 @@
+\documentclass[letterpaper,12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[top=2cm, left=2cm, right=2cm, bottom=2cm]{geometry}
+\linespread{1.5}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+
+\begin{document}
+
+\title{\normalsize{Universidad Simón Bolívar\\ CI-5321 -- Computación Gráfica
+II
+\\ \textbf{Proyecto 3 -- Informe}\\}}
+\author{\normalsize{07-41138 -- Alejandro Machado}\\ \normalsize{07-41279 --
+Marilyn Nowacka}}
+\date{\normalsize{\today}}
+\maketitle
+
+\thispagestyle{empty}
+\pagestyle{empty}
+
+El desarrollo de una aplicación WebGL fue una experiencia interesante, al
+tratarse de una tecnología experimental que representa el estado del arte en la
+computación gráfica accesible a todos a través de la web.
+
+La librería \texttt{three.js} fue de mucha utilidad para realizar la
+aplicación: el manejo directo de objetos utilizando \textit{shaders} tal como
+hemos visto en el tutorial puede llegar a ser engorroso e innecesariemente
+complejo. Esta librería provee una forma de manipular objetos tridimensionales
+mediante código javascript fácilmente, dirigida para personas con
+experiencia en programación pero no necesariamente expertos en \textit{shaders}
+o tecnologías web.
+
+Una de las dificultades que encontramos realizando este proyecto fue relativa a
+la carga de modelos OBJ. Fue posible reutilizar un componente del código de
+\texttt{three.js} que incluía un \textit{parser} de Wavefront OBJ, pero
+encontramos con frecuencia que la carga de modelos arrojaba errores en la
+fase de materiales y texturizado. Como los requerimientos del proyecto no incluían el
+manejo de materiales (MTL), decidimos cargar solamente la geometría del OBJ y
+asignar colores arbitrariamente al modelo.
+
+Otra dificultad fue que al cargar los modelos OBJ se debía ajustar
+automáticamente la escala en la que se dibujaba la figura, para poder
+representarla en un tamaño razonable en el centro de la pantalla. Para esto
+utilizamos las funciones de cálculo de caja cobertora (\textit{bounding boxes})
+y escogimos unos valores numéricos de escalamiento que funcionaron
+satisfactoriamente en todos los modelos de ejemplo que probamos.
+\\
+
+Finalmente, no cumplimos el objetivo de utilizar el esquema de
+refinamiento propuesto por Charles Loop.  Para esto debíamos modificar el código 
+de \texttt{three.js} que implementa el modelo de Catmull-Clark, lo cual no
+logramos realizar. Sí conseguimos utilizar una técnica de teselado para triangularizar las
+superficies como preparación para el algoritmo de Loop, pero las subdivisiones
+siguen ejecutándose con el algoritmo de Catmull-Clark.
+\end{document}
